@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-# ✅ Allow frontend connection
+# ✅ Enable CORS (frontend can connect)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -18,12 +18,12 @@ def home():
     return {"message": "AI Ticketing Backend Running 🚀"}
 
 
-# ✅ Ticket Analysis (AI-like logic)
+# ✅ Ticket Analysis
 @app.post("/analyze")
 def analyze(ticket: dict):
-    text = ticket.get("text", "").lower()
+    text = str(ticket.get("text", "")).lower()
 
-    # 🔐 Password issues
+    # 🔐 Password / login issues
     if "password" in text or "login" in text:
         return {
             "category": "Access",
@@ -36,10 +36,10 @@ def analyze(ticket: dict):
         }
 
     # 💰 Salary / payment issues
-    elif "salary" in text or "payment" in text or "money" in text:
+    if "salary" in text or "payment" in text or "credited" in text:
         return {
             "category": "Billing",
-            "summary": "Salary or payment not received",
+            "summary": "Salary or payment issue",
             "severity": "High",
             "action": "assign",
             "response": "",
@@ -47,8 +47,8 @@ def analyze(ticket: dict):
             "sentiment": "Frustrated"
         }
 
-    # 🖥️ Server issues
-    elif "server" in text or "down" in text or "not working" in text:
+    # 🖥️ Server / system issues
+    if "server" in text or "down" in text or "not working" in text:
         return {
             "category": "Server",
             "summary": "Server or system outage",
@@ -59,11 +59,11 @@ def analyze(ticket: dict):
             "sentiment": "Frustrated"
         }
 
-    # 🏖️ Leave / HR issues
-    elif "leave" in text or "holiday" in text or "vacation" in text:
+    # 🏖️ HR / leave issues
+    if "leave" in text or "holiday" in text or "vacation" in text:
         return {
             "category": "HR",
-            "summary": "Leave or HR related query",
+            "summary": "Leave or HR related request",
             "severity": "Medium",
             "action": "assign",
             "response": "",
@@ -71,11 +71,11 @@ def analyze(ticket: dict):
             "sentiment": "Neutral"
         }
 
-    # 🐞 Bug / feature issues
-    elif "bug" in text or "error" in text or "issue" in text:
+    # 🐞 Bug / general issues
+    if "bug" in text or "error" in text or "issue" in text:
         return {
             "category": "Bug",
-            "summary": "System bug or unexpected issue",
+            "summary": "System bug or issue",
             "severity": "Medium",
             "action": "assign",
             "response": "",
@@ -83,14 +83,13 @@ def analyze(ticket: dict):
             "sentiment": "Neutral"
         }
 
-    # 🔧 Default case
-    else:
-        return {
-            "category": "General",
-            "summary": "General support request",
-            "severity": "Medium",
-            "action": "assign",
-            "response": "",
-            "department": "Support",
-            "sentiment": "Neutral"
-        }
+    # 🔧 Default fallback
+    return {
+        "category": "General",
+        "summary": "General support request",
+        "severity": "Medium",
+        "action": "assign",
+        "response": "",
+        "department": "Support",
+        "sentiment": "Neutral"
+    }
