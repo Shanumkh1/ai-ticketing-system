@@ -6,63 +6,87 @@ function App() {
   const [history, setHistory] = useState([]);
 
   const sendTicket = async () => {
-    const res = await fetch("https://ai-ticketing-system-hord.onrender.com/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ text }),
-    });
+    try {
+      const res = await fetch(
+        "https://ai-ticketing-system-hord.onrender.com/analyze",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ text }),
+        }
+      );
 
-    const data = await res.json();
+      const data = await res.json();
 
-    const newTicket = {
-      id: Date.now(),
-      text,
-      status: data.action === "auto-resolve" ? "Resolved" : "Assigned",
-      ...data
-    };
+      const newTicket = {
+        id: Date.now(),
+        text,
+        status: data.action === "auto-resolve" ? "Resolved" : "Assigned",
+        ...data,
+      };
 
-    setResult(newTicket);
-    setHistory([newTicket, ...history]);
-    setText("");
-  };
-
-  // 🎨 Severity color
-  const getSeverityColor = (severity) => {
-    switch (severity) {
-      case "Critical": return "red";
-      case "High": return "orange";
-      case "Medium": return "gold";
-      case "Low": return "green";
-      default: return "gray";
+      setResult(newTicket);
+      setHistory([newTicket, ...history]);
+      setText("");
+    } catch (error) {
+      console.error(error);
+      alert("Error connecting to backend");
     }
   };
 
-  // 🎯 Status color
+  // 🎨 Severity colors
+  const getSeverityColor = (severity) => {
+    switch (severity) {
+      case "Critical":
+        return "red";
+      case "High":
+        return "orange";
+      case "Medium":
+        return "gold";
+      case "Low":
+        return "green";
+      default:
+        return "gray";
+    }
+  };
+
+  // 🎯 Status colors
   const getStatusColor = (status) => {
     switch (status) {
-      case "Resolved": return "green";
-      case "Assigned": return "blue";
-      case "New": return "gray";
-      default: return "black";
+      case "Resolved":
+        return "green";
+      case "Assigned":
+        return "blue";
+      default:
+        return "black";
     }
   };
 
   return (
-    <div style={{ fontFamily: "Arial", background: "#f4f6f8", minHeight: "100vh", padding: "20px" }}>
-
-      <h1 style={{ textAlign: "center" }}>🚀 AI Ticketing Dashboard</h1>
-
-      {/* Input Card */}
-      <div style={{
-        background: "white",
+    <div
+      style={{
+        fontFamily: "Arial",
+        background: "#f4f6f8",
+        minHeight: "100vh",
         padding: "20px",
-        borderRadius: "10px",
-        maxWidth: "600px",
-        margin: "20px auto",
-        boxShadow: "0 2px 10px rgba(0,0,0,0.1)"
-      }}>
+      }}
+    >
+      <h1 style={{ textAlign: "center" }}>
+        🚀 AI Ticketing Dashboard
+      </h1>
+
+      {/* Input */}
+      <div
+        style={{
+          background: "white",
+          padding: "20px",
+          borderRadius: "10px",
+          maxWidth: "600px",
+          margin: "20px auto",
+        }}
+      >
         <textarea
           placeholder="Describe your issue..."
           value={text}
@@ -75,11 +99,11 @@ function App() {
           onClick={sendTicket}
           style={{
             marginTop: "10px",
-            padding: "10px 20px",
+            padding: "10px",
             background: "#007bff",
             color: "white",
             border: "none",
-            borderRadius: "5px"
+            borderRadius: "5px",
           }}
         >
           Submit Ticket
@@ -88,14 +112,15 @@ function App() {
 
       {/* Latest Result */}
       {result && (
-        <div style={{
-          background: "white",
-          padding: "20px",
-          borderRadius: "10px",
-          maxWidth: "600px",
-          margin: "20px auto",
-          boxShadow: "0 2px 10px rgba(0,0,0,0.1)"
-        }}>
+        <div
+          style={{
+            background: "white",
+            padding: "20px",
+            borderRadius: "10px",
+            maxWidth: "600px",
+            margin: "20px auto",
+          }}
+        >
           <h3>🎯 Latest Ticket</h3>
           <p><b>Issue:</b> {result.text}</p>
           <p><b>Category:</b> {result.category}</p>
@@ -117,12 +142,14 @@ function App() {
           <p><b>Department:</b> {result.department}</p>
 
           {result.response && (
-            <div style={{
-              marginTop: "10px",
-              padding: "10px",
-              background: "#e6f7ff",
-              borderRadius: "5px"
-            }}>
+            <div
+              style={{
+                marginTop: "10px",
+                padding: "10px",
+                background: "#e6f7ff",
+                borderRadius: "5px",
+              }}
+            >
               💡 {result.response}
             </div>
           )}
@@ -134,13 +161,15 @@ function App() {
         <h2>📜 Ticket History</h2>
 
         {history.map((t) => (
-          <div key={t.id} style={{
-            background: "white",
-            padding: "15px",
-            marginBottom: "10px",
-            borderRadius: "8px",
-            boxShadow: "0 1px 5px rgba(0,0,0,0.1)"
-          }}>
+          <div
+            key={t.id}
+            style={{
+              background: "white",
+              padding: "15px",
+              marginBottom: "10px",
+              borderRadius: "8px",
+            }}
+          >
             <p><b>Issue:</b> {t.text}</p>
 
             <p>
@@ -161,7 +190,6 @@ function App() {
           </div>
         ))}
       </div>
-
     </div>
   );
 }
