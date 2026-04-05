@@ -6,7 +6,7 @@ function App() {
   const [history, setHistory] = useState([]);
 
   const sendTicket = async () => {
-    const res = await fetch("http://127.0.0.1:8000/analyze", {
+    const res = await fetch("https://ai-ticketing-system-hord.onrender.com/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
