@@ -5,24 +5,26 @@ function App() {
   const [result, setResult] = useState(null);
   const [history, setHistory] = useState([]);
 
+  // ✅ FIXED FUNCTION (POST request)
   const sendTicket = async () => {
     try {
       const res = await fetch(
         "https://ai-ticketing-system-hord.onrender.com/analyze",
         {
-          method: "POST",
+          method: "POST", // 🔥 IMPORTANT FIX
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ text }),
+          body: JSON.stringify({
+            text: text,
+          }),
         }
       );
 
       const data = await res.json();
 
-      console.log("API DATA:", data);
+      console.log("API RESPONSE:", data);
 
-      // ✅ Proper mapping
       const newTicket = {
         id: Date.now(),
         text: text,
@@ -38,8 +40,8 @@ function App() {
       setHistory((prev) => [newTicket, ...prev]);
       setText("");
     } catch (error) {
-      console.error(error);
-      alert("Error connecting to backend");
+      console.error("ERROR:", error);
+      alert("Backend connection failed");
     }
   };
 
