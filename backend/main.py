@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-# ✅ Enable CORS (frontend can connect)
+# ✅ CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -12,22 +12,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ✅ Home route
 @app.get("/")
 def home():
     return {"message": "AI Ticketing Backend Running 🚀"}
 
 
-# ✅ Ticket Analysis
 @app.post("/analyze")
 def analyze(ticket: dict):
     text = str(ticket.get("text", "")).lower()
 
-    # 🔐 Password / login issues
+    # PASSWORD
     if "password" in text or "login" in text:
         return {
             "category": "Access",
-            "summary": "User unable to login / password issue",
+            "summary": "Password issue",
             "severity": "Low",
             "action": "auto-resolve",
             "response": "Use 'Forgot Password' option to reset your password.",
@@ -35,11 +33,11 @@ def analyze(ticket: dict):
             "sentiment": "Neutral"
         }
 
-    # 💰 Salary / payment issues
-    if "salary" in text or "payment" in text or "credited" in text:
+    # SALARY
+    if "salary" in text or "credited" in text or "payment" in text:
         return {
             "category": "Billing",
-            "summary": "Salary or payment issue",
+            "summary": "Salary issue",
             "severity": "High",
             "action": "assign",
             "response": "",
@@ -47,11 +45,11 @@ def analyze(ticket: dict):
             "sentiment": "Frustrated"
         }
 
-    # 🖥️ Server / system issues
-    if "server" in text or "down" in text or "not working" in text:
+    # SERVER
+    if "server" in text or "down" in text:
         return {
             "category": "Server",
-            "summary": "Server or system outage",
+            "summary": "Server issue",
             "severity": "Critical",
             "action": "assign",
             "response": "",
@@ -59,34 +57,10 @@ def analyze(ticket: dict):
             "sentiment": "Frustrated"
         }
 
-    # 🏖️ HR / leave issues
-    if "leave" in text or "holiday" in text or "vacation" in text:
-        return {
-            "category": "HR",
-            "summary": "Leave or HR related request",
-            "severity": "Medium",
-            "action": "assign",
-            "response": "",
-            "department": "HR",
-            "sentiment": "Neutral"
-        }
-
-    # 🐞 Bug / general issues
-    if "bug" in text or "error" in text or "issue" in text:
-        return {
-            "category": "Bug",
-            "summary": "System bug or issue",
-            "severity": "Medium",
-            "action": "assign",
-            "response": "",
-            "department": "Engineering",
-            "sentiment": "Neutral"
-        }
-
-    # 🔧 Default fallback
+    # DEFAULT
     return {
         "category": "General",
-        "summary": "General support request",
+        "summary": "General issue",
         "severity": "Medium",
         "action": "assign",
         "response": "",

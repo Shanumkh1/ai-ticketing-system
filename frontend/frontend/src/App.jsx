@@ -20,11 +20,17 @@ function App() {
 
       const data = await res.json();
 
+      console.log("API RESPONSE:", data);
+
       const newTicket = {
         id: Date.now(),
         text,
-        status: data.action === "auto-resolve" ? "Resolved" : "Assigned",
-        ...data,
+        category: data.category || "N/A",
+        severity: data.severity || "N/A",
+        department: data.department || "N/A",
+        status:
+          data.action === "auto-resolve" ? "Resolved" : "Assigned",
+        response: data.response || "",
       };
 
       setResult(newTicket);
@@ -36,7 +42,6 @@ function App() {
     }
   };
 
-  // 🎨 Severity colors
   const getSeverityColor = (severity) => {
     switch (severity) {
       case "Critical":
@@ -52,41 +57,16 @@ function App() {
     }
   };
 
-  // 🎯 Status colors
   const getStatusColor = (status) => {
-    switch (status) {
-      case "Resolved":
-        return "green";
-      case "Assigned":
-        return "blue";
-      default:
-        return "black";
-    }
+    return status === "Resolved" ? "green" : "blue";
   };
 
   return (
-    <div
-      style={{
-        fontFamily: "Arial",
-        background: "#f4f6f8",
-        minHeight: "100vh",
-        padding: "20px",
-      }}
-    >
-      <h1 style={{ textAlign: "center" }}>
-        🚀 AI Ticketing Dashboard
-      </h1>
+    <div style={{ fontFamily: "Arial", padding: "20px", background: "#f4f6f8" }}>
+      <h1 style={{ textAlign: "center" }}>🚀 AI Ticketing Dashboard</h1>
 
       {/* Input */}
-      <div
-        style={{
-          background: "white",
-          padding: "20px",
-          borderRadius: "10px",
-          maxWidth: "600px",
-          margin: "20px auto",
-        }}
-      >
+      <div style={{ background: "white", padding: "20px", maxWidth: "600px", margin: "auto" }}>
         <textarea
           placeholder="Describe your issue..."
           value={text}
@@ -97,31 +77,17 @@ function App() {
 
         <button
           onClick={sendTicket}
-          style={{
-            marginTop: "10px",
-            padding: "10px",
-            background: "#007bff",
-            color: "white",
-            border: "none",
-            borderRadius: "5px",
-          }}
+          style={{ marginTop: "10px", padding: "10px", background: "#007bff", color: "white" }}
         >
           Submit Ticket
         </button>
       </div>
 
-      {/* Latest Result */}
+      {/* Result */}
       {result && (
-        <div
-          style={{
-            background: "white",
-            padding: "20px",
-            borderRadius: "10px",
-            maxWidth: "600px",
-            margin: "20px auto",
-          }}
-        >
+        <div style={{ background: "white", padding: "20px", maxWidth: "600px", margin: "20px auto" }}>
           <h3>🎯 Latest Ticket</h3>
+
           <p><b>Issue:</b> {result.text}</p>
           <p><b>Category:</b> {result.category}</p>
 
@@ -142,14 +108,7 @@ function App() {
           <p><b>Department:</b> {result.department}</p>
 
           {result.response && (
-            <div
-              style={{
-                marginTop: "10px",
-                padding: "10px",
-                background: "#e6f7ff",
-                borderRadius: "5px",
-              }}
-            >
+            <div style={{ marginTop: "10px", padding: "10px", background: "#e6f7ff" }}>
               💡 {result.response}
             </div>
           )}
@@ -157,36 +116,15 @@ function App() {
       )}
 
       {/* History */}
-      <div style={{ maxWidth: "900px", margin: "40px auto" }}>
+      <div style={{ maxWidth: "800px", margin: "40px auto" }}>
         <h2>📜 Ticket History</h2>
 
         {history.map((t) => (
-          <div
-            key={t.id}
-            style={{
-              background: "white",
-              padding: "15px",
-              marginBottom: "10px",
-              borderRadius: "8px",
-            }}
-          >
-            <p><b>Issue:</b> {t.text}</p>
-
-            <p>
-              <b>Severity:</b>{" "}
-              <span style={{ color: getSeverityColor(t.severity) }}>
-                {t.severity}
-              </span>
-            </p>
-
-            <p>
-              <b>Status:</b>{" "}
-              <span style={{ color: getStatusColor(t.status) }}>
-                {t.status}
-              </span>
-            </p>
-
-            <p><b>Department:</b> {t.department}</p>
+          <div key={t.id} style={{ background: "white", padding: "10px", marginBottom: "10px" }}>
+            <p><b>{t.text}</b></p>
+            <p>Severity: <span style={{ color: getSeverityColor(t.severity) }}>{t.severity}</span></p>
+            <p>Status: <span style={{ color: getStatusColor(t.status) }}>{t.status}</span></p>
+            <p>Dept: {t.department}</p>
           </div>
         ))}
       </div>
